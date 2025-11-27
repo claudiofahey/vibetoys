@@ -13,11 +13,12 @@ This simulation demonstrates how random walks behave over many iterations, compa
 ### Game Modes
 
 **Additive Mode (+/- $1)**
-- Start with $0
+- Start with $100
 - Win: +$1
 - Lose: -$1
 - Symmetric random walk
-- Expected value: $0
+- Expected value: $100
+- Can go negative
 
 **Multiplicative Mode (× 1.1 / × 0.9)**
 - Start with $100
@@ -25,6 +26,7 @@ This simulation demonstrates how random walks behave over many iterations, compa
 - Lose: ×0.9 (lose 10%)
 - Asymmetric growth/decay
 - Expected value: negative (due to volatility drag)
+- Can go negative
 
 ### Visualization
 

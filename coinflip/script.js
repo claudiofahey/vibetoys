@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const results = [];
 
             for (let i = 0; i < numSimulations; i++) {
-                let balance = gameMode === 'multiplicative' ? 1 : 100;
+                let balance = 100;
 
                 for (let j = 0; j < flipsPerGame; j++) {
                     const isHeads = Math.random() < 0.5;
@@ -123,49 +123,82 @@ document.addEventListener('DOMContentLoaded', () => {
         let labels, data;
 
         if (isMultiplicative) {
-            // Create histogram bins using log scale
-            const binCount = 50; // Use fewer bins for cleaner look
+            // Create histogram bins
+            const binCount = 50;
             const minVal = Math.min(...results);
             const maxVal = Math.max(...results);
 
-            // Avoid log(0) issues
-            const safeMin = minVal > 0 ? minVal : 0.0001;
-            const logMin = Math.log10(safeMin);
-            const logMax = Math.log10(maxVal);
+            // Check if we have negative values - if so, use linear bins
+            if (minVal < 0) {
+                // Linear binning for negative values
+                const range = maxVal - minVal;
+                const binSize = range / binCount;
+                const bins = new Array(binCount).fill(0);
+                const binLabels = [];
 
-            const logRange = logMax - logMin;
-            const logBinSize = logRange / binCount;
+                for (let i = 0; i < binCount; i++) {
+                    const binStart = minVal + i * binSize;
+                    const binEnd = minVal + (i + 1) * binSize;
+                    const binCenter = (binStart + binEnd) / 2;
 
-            const bins = new Array(binCount).fill(0);
-            const binLabels = [];
-
-            // Create labels (geometric mean of bin edges)
-            for (let i = 0; i < binCount; i++) {
-                const binLogStart = logMin + i * logBinSize;
-                const binLogEnd = logMin + (i + 1) * logBinSize;
-                const binCenter = Math.pow(10, (binLogStart + binLogEnd) / 2);
-
-                // Format label nicely
-                if (binCenter < 0.01) {
-                    binLabels.push(binCenter.toExponential(1));
-                } else if (binCenter < 100) {
-                    binLabels.push(binCenter.toFixed(2));
-                } else {
-                    binLabels.push(Math.round(binCenter).toString());
+                    if (Math.abs(binCenter) < 0.01) {
+                        binLabels.push(binCenter.toExponential(1));
+                    } else if (Math.abs(binCenter) < 100) {
+                        binLabels.push(binCenter.toFixed(2));
+                    } else {
+                        binLabels.push(Math.round(binCenter).toString());
+                    }
                 }
+
+                results.forEach(val => {
+                    let binIndex = Math.floor((val - minVal) / binSize);
+                    if (binIndex >= binCount) binIndex = binCount - 1;
+                    if (binIndex < 0) binIndex = 0;
+                    bins[binIndex]++;
+                });
+
+                labels = binLabels;
+                data = bins;
+            } else {
+                // Log scale binning for all positive values
+                const safeMin = minVal > 0 ? minVal : 0.0001;
+                const logMin = Math.log10(safeMin);
+                const logMax = Math.log10(maxVal);
+
+                const logRange = logMax - logMin;
+                const logBinSize = logRange / binCount;
+
+                const bins = new Array(binCount).fill(0);
+                const binLabels = [];
+
+                // Create labels (geometric mean of bin edges)
+                for (let i = 0; i < binCount; i++) {
+                    const binLogStart = logMin + i * logBinSize;
+                    const binLogEnd = logMin + (i + 1) * logBinSize;
+                    const binCenter = Math.pow(10, (binLogStart + binLogEnd) / 2);
+
+                    // Format label nicely
+                    if (binCenter < 0.01) {
+                        binLabels.push(binCenter.toExponential(1));
+                    } else if (binCenter < 100) {
+                        binLabels.push(binCenter.toFixed(2));
+                    } else {
+                        binLabels.push(Math.round(binCenter).toString());
+                    }
+                }
+
+                results.forEach(val => {
+                    if (val <= 0) return; // Skip non-positive values
+                    const logVal = Math.log10(val);
+                    let binIndex = Math.floor((logVal - logMin) / logBinSize);
+                    if (binIndex >= binCount) binIndex = binCount - 1;
+                    if (binIndex < 0) binIndex = 0;
+                    bins[binIndex]++;
+                });
+
+                labels = binLabels;
+                data = bins;
             }
-
-            results.forEach(val => {
-                if (val <= 0) return; // Skip non-positive values
-                const logVal = Math.log10(val);
-                let binIndex = Math.floor((logVal - logMin) / logBinSize);
-                if (binIndex >= binCount) binIndex = binCount - 1;
-                if (binIndex < 0) binIndex = 0;
-                bins[binIndex]++;
-            });
-
-            labels = binLabels;
-            data = bins;
         } else {
             // Discrete frequency
             const counts = {};
