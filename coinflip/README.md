@@ -6,6 +6,8 @@ An interactive web application that simulates thousands of coin flip games to vi
 
 This simulation demonstrates how random walks behave over many iterations, comparing additive and multiplicative game modes. It's a powerful tool for understanding probability, expected value, and the surprising differences between additive and multiplicative processes.
 
+> **Inspiration**: This project was inspired by the video [The Coin Flip Conundrum - Po-Shen Loh](https://www.youtube.com/watch?v=HBluLfX2F_k&t=395s)
+
 ## Features
 
 ### Game Modes
