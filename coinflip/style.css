@@ -113,6 +113,22 @@ header p {
     font-size: 1.1rem;
 }
 
+.hero-image {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border-radius: 16px;
+    margin: 0 auto 1.5rem;
+    display: block;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.hero-image:hover {
+    transform: scale(1.02);
+}
+
+
 /* Glassmorphism */
 .glass-panel {
     background: var(--glass-bg);
